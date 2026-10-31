@@ -3868,6 +3868,7 @@ if (d.keepalive) kv(parts, t("det.keepalive"), d.keepalive.tierLabel + " · " + 
             dbg.inp.checked = draft.debug === true;
             ptRow.inp.checked = draft.passthrough === true;
             imgRow.inp.checked = draft.imageRescale !== false;
+            tsRow.inp.checked = cp ? cp.messageTimestamps !== false : true;
             const ab = (cp && cp.absorb && typeof cp.absorb === "object" && !Array.isArray(cp.absorb)) ? cp.absorb : null;
             abRow.inp.checked = ab ? ab.enabled === true : false;
             const pv = (cp && typeof cp.promptPack === "string") ? cp.promptPack : "default";
@@ -4037,6 +4038,13 @@ if (d.keepalive) kv(parts, t("det.keepalive"), d.keepalive.tierLabel + " · " + 
             else packNote.textContent = t("cfg.q_pack_custom");
         }
         box.appendChild(packNote);
+        // #4313 display gate — default ON since the leak-audit follow-up;
+        // unchecking writes an EXPLICIT false (deleting the key would
+        // silently resolve back to on).
+        const tsRow = row("quick-message-ts", t("cfg.q_message_ts"));
+        qCtrls.push(tsRow.inp);
+        tsRow.inp.addEventListener("change", () => commit((d) => { if (!compressOf(d)) d.compress = {}; if (tsRow.inp.checked) delete d.compress.messageTimestamps; else d.compress.messageTimestamps = false; }));
+        void tsRow.ctl;
         // #5328: user-dir pack management — 新建/编辑/删除 under the dir the
         // server reported via GET /__bili/packs (userDir). Builtin/shipped
         // packs are read-only here; guidance says "override with a same-named
